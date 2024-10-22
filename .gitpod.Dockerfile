@@ -1,25 +1,40 @@
-FROM gitpod/workspace-full
+# Usar una imagen base de Gitpod
+FROM gitpod/workspace-full:latest
 
-RUN sudo apt-get update \
-    && sudo apt-get install -y \
-    php7.4 \
-    php7.4-cli \
-    php7.4-fpm \
-    php7.4-common \
-    php7.4-curl \
-    php7.4-intl \
-    php7.4-mbstring \
-    php7.4-mysql \
-    php7.4-xml \
-    php7.4-zip \
-    php7.4-bcmath \
-    php7.4-gd \
-    php7.4-soap \
-    mysql-server \
-    apache2
+# Instalar dependencias necesarias
+RUN sudo apt-get update && sudo apt-get install -y \
+    apache2 \
+    mariadb-server \
+    php \
+    php-cli \
+    php-fpm \
+    php-mysql \
+    php-xml \
+    php-mbstring \
+    php-intl \
+    php-zip \
+    php-curl \
+    php-gd \
+    libapache2-mod-php \
+    unzip \
+    curl \
+    && sudo apt-get clean
 
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
-    && php -r "unlink('composer-setup.php');"
+# Habilitar modulos necesarios de Apache
+RUN sudo a2enmod rewrite
 
-RUN composer global require hirak/prestissimo
+# Crear el directorio de Magento
+RUN sudo mkdir -p /var/www/html/magento
+
+# Cambiar permisos
+RUN sudo chown -R gitpod:gitpod /var/www/html/magento
+
+# Establecer el directorio de trabajo
+WORKDIR /var/www/html/magento
+
+# Instalar Composer
+RUN curl -sS https://getcomposer.org/installer | php \
+    && sudo mv composer.phar /usr/local/bin/composer
+
+# Exponer el puerto 80 para Apache
+EXPOSE 80

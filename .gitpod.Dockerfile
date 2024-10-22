@@ -15,6 +15,7 @@ RUN sudo apt-get update && sudo apt-get install -y \
     php-zip \
     php-curl \
     php-gd \
+    php-soap \  # <- Agregar esta línea
     libapache2-mod-php \
     unzip \
     curl \

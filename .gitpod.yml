@@ -1,0 +1,31 @@
+image:
+  file: .gitpod.Dockerfile
+
+ports:
+  - port: 80
+    onOpen: open-preview
+  - port: 3306
+    onOpen: ignore
+
+tasks:
+  - init: |
+      composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition .
+      mysql -u root -e "create database magento;"
+      php bin/magento setup:install \
+        --base-url=$GITPOD_WORKSPACE_URL \
+        --db-host=localhost \
+        --db-name=magento \
+        --db-user=root \
+        --db-password="" \
+        --admin-firstname=Admin \
+        --admin-lastname=User \
+        --admin-email=admin@example.com \
+        --admin-user=admin \
+        --admin-password=admin123 \
+        --language=en_US \
+        --currency=USD \
+        --timezone=America/Chicago \
+        --use-rewrites=1 \
+        --backend-frontname=admin
+    command: |
+      php -S 0.0.0.0:80 -t pub/

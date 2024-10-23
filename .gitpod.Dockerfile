@@ -41,4 +41,4 @@ RUN curl -sS https://getcomposer.org/installer | php \
     && sudo mv composer.phar /usr/local/bin/composer
 
 # Exponer el puerto 80 para Apache
-EXPOSE 80
+EXPOSE 8080

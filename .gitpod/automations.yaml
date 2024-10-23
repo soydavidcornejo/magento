@@ -1,37 +1,40 @@
 tasks:
-    hello:
-        name: Hello World
+    setup:
+        name: Setup Project
+        description: Setup the environment and dependencies for Magento
         command: |
-            echo "Hello, World!"
+            sudo service apache2 start
+            sudo service mysql start
+            sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS magento;"
+            sudo mysql -u root -e "CREATE USER IF NOT EXISTS 'magentouser'@'localhost' IDENTIFIED BY 'password123';"
+            sudo mysql -u root -e "GRANT ALL PRIVILEGES ON magento.* TO 'magentouser'@'localhost';"
+            sudo mysql -u root -e "FLUSH PRIVILEGES;"
+            cd /workspace/magento
+            composer install
         triggeredBy:
-        - manual
-        # - postEnvironmentStart
-        # - postDevcontainerStart
+        - postEnvironmentStart  # Esto asegura que se ejecuta cuando inicias el entorno
 
 services:
     backend:
-        name: Backend Service
-        description: Example service simulating a backend
+        name: Backend Service (Apache & MySQL)
+        description: Starts Apache and MySQL services for Magento development
         commands:
             start: |
-                echo "Starting backend service..."
+                echo "Starting backend services (Apache & MySQL)..."
+                sudo service apache2 start
+                sudo service mysql start
                 touch /tmp/backend.started
                 while true; do
                     sleep 1
                     date
                 done
             ready: |
-                if [ -f /tmp/backend.started ]; then
-                    echo "Backend service is ready"
+                if sudo service apache2 status | grep running && sudo service mysql status | grep running; then
+                    echo "Backend services (Apache & MySQL) are ready"
                     exit 0
                 else
-                    echo "Backend service is not ready"
+                    echo "Backend services are not ready"
                     exit 1
                 fi
-            # stop: |
-            # 	echo "Stopping backend service..."
-            # 	rm /tmp/backend.started
-            #   pkill backend
         triggeredBy:
-            - postEnvironmentStart
-            # - postDevcontainerStart
+        - postEnvironmentStart  # Se ejecuta automáticamente tras iniciar el entorno

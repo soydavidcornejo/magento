@@ -1,25 +1,40 @@
 # Configurar el servicio de MySQL y Apache en Gitpod
 image:
-  file: Dockerfile
+  file: .gitpod.Dockerfile
 
 # Definir las tareas iniciales al abrir el workspace
 tasks:
-  - name: Iniciar Apache y MySQL
+  - name: Iniciar servicios y preparar Magento
     init: |
       sudo service apache2 start
       sudo service mysql start
-      sudo mysql -u root -e "CREATE DATABASE magento;"
-      sudo mysql -u root -e "CREATE USER 'magentouser'@'localhost' IDENTIFIED BY 'password123';"
+      sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS magento;"
+      sudo mysql -u root -e "CREATE USER IF NOT EXISTS 'magentouser'@'localhost' IDENTIFIED BY 'password123';"
       sudo mysql -u root -e "GRANT ALL PRIVILEGES ON magento.* TO 'magentouser'@'localhost';"
       sudo mysql -u root -e "FLUSH PRIVILEGES;"
     command: |
       cd /workspace/magento
       composer install
+      php bin/magento setup:install \
+        --base-url=http://localhost \
+        --db-host=localhost \
+        --db-name=magento \
+        --db-user=magentouser \
+        --db-password=password123 \
+        --admin-firstname=admin \
+        --admin-lastname=admin \
+        --admin-email=admin@example.com \
+        --admin-user=admin \
+        --admin-password=admin123 \
+        --language=en_US \
+        --currency=USD \
+        --timezone=America/Chicago \
+        --use-rewrites=1
 
 # Definir los puertos que Gitpod expondrá
 ports:
   - port: 80
-    onOpen: open-browser
+    onOpen: open-preview
 
 # Variables de entorno (opcional)
 env:

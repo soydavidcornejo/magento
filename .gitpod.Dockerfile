@@ -24,6 +24,9 @@ RUN sudo apt-get update && sudo apt-get install -y \
 # Habilitar modulos necesarios de Apache
 RUN sudo a2enmod rewrite
 
+# Habilitar extensión SOAP
+RUN sudo phpenmod soap
+
 # Crear el directorio de Magento
 RUN sudo mkdir -p /var/www/html/magento
 
